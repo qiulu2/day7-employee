@@ -50,4 +50,16 @@ public class CompanyController {
         companies.add(newCompany);
         return newCompany;
     }
+
+    @PutMapping("/{id}")
+    public Company update(@PathVariable Integer id, @RequestBody Company company) {
+        for (int i = 0; i < companies.size(); i++) {
+            if (companies.get(i).id().equals(id)) {
+                Company updatedCompany = new Company(id, company.name());
+                companies.set(i, updatedCompany);
+                return updatedCompany;
+            }
+        }
+        return null;
+    }
 }

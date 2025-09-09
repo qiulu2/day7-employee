@@ -9,8 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -105,5 +104,23 @@ public class CompanyControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").isNumber())
                 .andExpect(jsonPath("$.name").value("spring"));
+    }
+
+    @Test
+    void should_return_company_when_put_update_company() throws Exception {
+        // given
+        Company company = new Company(1, "spring");
+        companyController.addCompany(company);
+        String updateJson = "{\"name\":\"alibaba\"}";
+
+        MockHttpServletRequestBuilder request = put("/companies/" + company.id())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updateJson);
+
+        //when then
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(company.id()))
+                .andExpect(jsonPath("$.name").value("alibaba"));
     }
 }
