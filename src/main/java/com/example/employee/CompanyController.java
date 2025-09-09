@@ -1,5 +1,6 @@
 package com.example.employee;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -40,5 +41,13 @@ public class CompanyController {
                 .filter(company -> company.id().equals(id))
                 .findFirst()
                 .orElse(null);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public Company create(@RequestBody Company company) {
+        Company newCompany = new Company(++id, company.name());
+        companies.add(newCompany);
+        return newCompany;
     }
 }
