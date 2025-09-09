@@ -1,6 +1,8 @@
 package com.example.employee;
 
 import com.jayway.jsonpath.JsonPath;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -8,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+
+import java.sql.Time;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -20,6 +24,12 @@ public class EmployeeControllerTest {
     private MockMvc mockMvc;
     @Autowired
     private EmployeeController employeeController;
+
+
+    @BeforeEach
+    public void setup() {
+        employeeController.clear();
+    }
 
     @Test
     void should_return_create_employee_when_post() throws Exception {
@@ -53,17 +63,38 @@ public class EmployeeControllerTest {
         Employee employee = new Employee(1, "John Smith", 32, "Male", 5000.0);
         Employee expect = employeeController.create(employee);
 
-        MockHttpServletRequestBuilder postRequest = get("/employees/"+expect.id())
+        MockHttpServletRequestBuilder request = get("/employees/"+expect.id())
                 .contentType(MediaType.APPLICATION_JSON);
 
         //when then
-        mockMvc.perform(postRequest)
+        mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(expect.id()))
                 .andExpect(jsonPath("$.name").value(expect.name()))
                 .andExpect(jsonPath("$.age").value(expect.age()))
                 .andExpect(jsonPath("$.gender").value(expect.gender()))
                 .andExpect(jsonPath("$.salary").value(expect.salary()));
+    }
+
+    @Test
+    void should_return_males_when_list_by_male()throws Exception{
+        Employee expect = new Employee(1, "John Smith", 32, "Male", 5000.0);
+
+        employeeController.create(new Employee(1, "John Smith", 32, "Male", 5000.0));
+        employeeController.create(new Employee(2, "Mike", 31, "Female", 5000.0));
+
+        MockHttpServletRequestBuilder request = get("/employees?gender=Male")
+                .contentType(MediaType.APPLICATION_JSON);
+
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].id").value(expect.id()))
+                .andExpect(jsonPath("$[0].name").value(expect.name()))
+                .andExpect(jsonPath("$[0].age").value(expect.age()))
+                .andExpect(jsonPath("$[0].gender").value(expect.gender()))
+                .andExpect(jsonPath("$[0].salary").value(expect.salary()));
     }
 
 }
