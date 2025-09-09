@@ -12,6 +12,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import java.sql.Time;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -86,7 +88,6 @@ public class EmployeeControllerTest {
         MockHttpServletRequestBuilder request = get("/employees?gender=Male")
                 .contentType(MediaType.APPLICATION_JSON);
 
-
         mockMvc.perform(request)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
@@ -95,6 +96,27 @@ public class EmployeeControllerTest {
                 .andExpect(jsonPath("$[0].age").value(expect.age()))
                 .andExpect(jsonPath("$[0].gender").value(expect.gender()))
                 .andExpect(jsonPath("$[0].salary").value(expect.salary()));
+    }
+
+    @Test
+    void should_return_3_employees_list_when_get_all() throws Exception {
+        List<Employee> expect = new ArrayList<Employee>();
+        expect.add(new Employee(1, "John Smith", 32, "Male", 5000.0));
+        expect.add(new Employee(2, "Mike", 31, "Female", 5000.0));
+        expect.add(new Employee(3, "Niko", 32, "Male", 5000.0));
+
+
+        employeeController.create(new Employee(1, "John Smith", 32, "Male", 5000.0));
+        employeeController.create(new Employee(2, "Mike", 31, "Female", 5000.0));
+        employeeController.create(new Employee(3, "Niko", 31, "Male", 5000.0));
+
+
+        MockHttpServletRequestBuilder request = get("/employees")
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(3));
     }
 
 }

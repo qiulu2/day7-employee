@@ -44,6 +44,9 @@ public class EmployeeController {
 
     @GetMapping
     public List<Employee> getByMale(@RequestParam(required = false) String gender) {
+        if(gender == null) {
+            return  employees;
+        }
         return  employees.stream()
                 .filter(employee -> employee.gender().equalsIgnoreCase(gender))
                 .collect(Collectors.toList());
