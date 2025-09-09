@@ -44,4 +44,21 @@ public class CompanyControllerTest {
                 .andExpect(jsonPath("$[0].id").value(expect.id()))
                 .andExpect(jsonPath("$[0].name").value(expect.name()));
     }
+
+    @Test
+    void should_return_company_when_get_by_id() throws Exception {
+        // given
+        Company company = new Company(1, "spring");
+        Company expect = company;
+        companyController.addCompany(company);
+
+        MockHttpServletRequestBuilder request = get("/companies/" + expect.id())
+                .contentType(MediaType.APPLICATION_JSON);
+
+        //when then
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(expect.id()))
+                .andExpect(jsonPath("$.name").value(expect.name()));
+    }
 }
