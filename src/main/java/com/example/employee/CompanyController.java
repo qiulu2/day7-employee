@@ -21,7 +21,16 @@ public class CompanyController {
     }
 
     @GetMapping
-    public List<Company> getAll() {
+    public List<Company> getAll(@RequestParam(required = false) Integer page,
+                                 @RequestParam(required = false) Integer size) {
+        if (page != null && size != null) {
+            int startIndex = page * size;
+            int endIndex = Math.min(startIndex + size, companies.size());
+            if (startIndex >= companies.size()) {
+                return new ArrayList<>();
+            }
+            return companies.subList(startIndex, endIndex);
+        }
         return companies;
     }
 

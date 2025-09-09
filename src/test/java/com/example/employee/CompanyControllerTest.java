@@ -61,4 +61,32 @@ public class CompanyControllerTest {
                 .andExpect(jsonPath("$.id").value(expect.id()))
                 .andExpect(jsonPath("$.name").value(expect.name()));
     }
+
+    @Test
+    void should_return_company_list_with_pagination() throws Exception {
+        // given
+        companyController.addCompany(new Company(1, "spring"));
+        companyController.addCompany(new Company(2, "alibaba"));
+        companyController.addCompany(new Company(3, "tencent"));
+        companyController.addCompany(new Company(4, "baidu"));
+        companyController.addCompany(new Company(5, "bytedance"));
+        companyController.addCompany(new Company(6, "huawei"));
+
+        MockHttpServletRequestBuilder request = get("/companies")
+                .param("page", "1")
+                .param("size", "3")
+                .contentType(MediaType.APPLICATION_JSON);
+
+        //when then
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(3))
+                .andExpect(jsonPath("$[0].id").value(4))
+                .andExpect(jsonPath("$[0].name").value("baidu"))
+                .andExpect(jsonPath("$[1].id").value(5))
+                .andExpect(jsonPath("$[1].name").value("bytedance"))
+                .andExpect(jsonPath("$[2].id").value(6))
+                .andExpect(jsonPath("$[2].name").value("huawei"));
+    }
 }
