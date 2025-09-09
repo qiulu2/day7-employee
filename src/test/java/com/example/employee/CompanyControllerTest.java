@@ -123,4 +123,18 @@ public class CompanyControllerTest {
                 .andExpect(jsonPath("$.id").value(company.id()))
                 .andExpect(jsonPath("$.name").value("alibaba"));
     }
+
+    @Test
+    void should_return_none_content_when_delete_company() throws Exception {
+        // given
+        Company company = new Company(1, "spring");
+        companyController.addCompany(company);
+
+        MockHttpServletRequestBuilder request = delete("/companies/" + company.id())
+                .contentType(MediaType.APPLICATION_JSON);
+
+        //when then
+        mockMvc.perform(request)
+                .andExpect(status().isNoContent());
+    }
 }
