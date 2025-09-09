@@ -1,7 +1,5 @@
 package com.example.employee;
 
-import com.jayway.jsonpath.JsonPath;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +9,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
-import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -65,7 +63,7 @@ public class EmployeeControllerTest {
         Employee employee = new Employee(1, "John Smith", 32, "Male", 5000.0);
         Employee expect = employeeController.create(employee);
 
-        MockHttpServletRequestBuilder request = get("/employees/"+expect.id())
+        MockHttpServletRequestBuilder request = get("/employees/" + expect.id())
                 .contentType(MediaType.APPLICATION_JSON);
 
         //when then
@@ -79,7 +77,7 @@ public class EmployeeControllerTest {
     }
 
     @Test
-    void should_return_males_when_list_by_male()throws Exception{
+    void should_return_males_when_list_by_male() throws Exception {
         Employee expect = new Employee(1, "John Smith", 32, "Male", 5000.0);
 
         employeeController.create(new Employee(1, "John Smith", 32, "Male", 5000.0));
@@ -118,5 +116,51 @@ public class EmployeeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(3));
     }
+
+    @Test
+    void should_return_updated_employee_when_update_a_employee() throws Exception {
+        String requestBody = """
+                {
+                    "id": 1,
+                    "name": "John Smith",
+                    "age": 32,
+                    "gender": "Male",
+                    "salary": 6000.0
+                }
+                """;
+        Employee expect = new Employee(1, "John Smith", 32, "Male", 6000.0);
+
+        employeeController.create(new Employee(1, "John Smith", 32, "Male", 5000.0));
+
+
+        MockHttpServletRequestBuilder request = put("/employees/" + expect.id())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody);
+
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(expect.id()))
+                .andExpect(jsonPath("$.name").value(expect.name()))
+                .andExpect(jsonPath("$.age").value(expect.age()))
+                .andExpect(jsonPath("$.gender").value(expect.gender()))
+                .andExpect(jsonPath("$.salary").value(expect.salary()));
+    }
+
+    @Test
+    void should_return_no_content_when_delete_a_employee() throws Exception {
+        Employee expect = new Employee(1, "John Smith", 32, "Male", 5000.0);
+        employeeController.create(new Employee(1, "John Smith", 32, "Male", 5000.0));
+
+
+        MockHttpServletRequestBuilder request = delete("/employees/" + expect.id())
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(request)
+
+                .andExpect(status().isNoContent());
+    }
+
+
 
 }

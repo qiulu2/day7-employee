@@ -51,6 +51,27 @@ public class EmployeeController {
                 .filter(employee -> employee.gender().equalsIgnoreCase(gender))
                 .collect(Collectors.toList());
     }
+
+    @PutMapping("{id}")
+    public Employee update(@PathVariable int id, @RequestBody Employee employee) {
+        for (Employee e : employees) {
+            if(e.id().equals(id)) {
+                employees.remove(e);
+                employees.add(employee);
+                return employee;
+            }
+        }
+        return null;
+    }
+
+
+    @DeleteMapping("{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable int id) {
+        employees.removeIf(employee -> employee.id().equals(id));
+    }
+
+
 }
 
 
