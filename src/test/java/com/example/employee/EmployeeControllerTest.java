@@ -161,6 +161,24 @@ public class EmployeeControllerTest {
                 .andExpect(status().isNoContent());
     }
 
+    @Test
+    void should_return_employee_when_get_with_query_page_size()throws Exception {
+        List<Employee> expect = new ArrayList<Employee>();
+        expect.add(new Employee(1, "John Smith", 32, "Male", 5000.0));
+        expect.add(new Employee(2, "Mike2", 32, "Male", 5000.0));
+//        expect.add(new Employee(3, "Mike3", 32, "Male", 5000.0));
+//        expect.add(new Employee(4, "Mike4", 32, "Male", 5000.0));
+//        expect.add(new Employee(5, "Mike5", 32, "Male", 5000.0));
+
+        employeeController.create(new Employee(1, "John Smith", 32, "Male", 5000.0));
+        employeeController.create(new Employee(2, "Mike2", 32, "Male", 5000.0));
 
 
+        MockHttpServletRequestBuilder request = get("/employees?page=1&size=5")
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2));
+    }
 }

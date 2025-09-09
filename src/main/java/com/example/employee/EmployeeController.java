@@ -71,7 +71,15 @@ public class EmployeeController {
         employees.removeIf(employee -> employee.id().equals(id));
     }
 
-
+    @GetMapping(params = {"page", "size"})
+    public List<Employee> getByPageAndSize(@RequestParam int page, @RequestParam int size) {
+        int start = (page - 1) * size;
+        int end = Math.min(start + size, employees.size());
+        if(start > employees.size()) {
+            return new ArrayList<>();
+        }
+        return employees.subList(start, end);
+    }
 }
 
 
